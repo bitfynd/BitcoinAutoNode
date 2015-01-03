@@ -1,12 +1,18 @@
 #!/bin/bash
 
-# WARNING!
-# Change these constants below to improve security
-# of the server before running this executable script!
+# Default constants
 currentSshPort=22
 newSshPort=44
 rpcport=8332
 btcport=8333
+
+echo "########### Configuration"
+read -e -i "$newSshPort" -p "New SSH port: " inputa
+newSshPort="${inputa:-$newSshPort}"
+read -e -i "$rpcport" -p "Bitcoind RPC port: " inputb
+rpcport="${inputb:-$newSshPort}"
+read -e -i "$btcport" -p "Bitcoind P2P port: " inputc
+btcport="${inputc:-$newSshPort}"
 
 echo "########### The server will reboot when the script is complete"
 
@@ -34,7 +40,7 @@ apt-get dist-upgrade -y
 apt-get autoremove -y
 apt-get install python-software-properties -y
 
-echo "########### Adding Bitcoin software repository and installing Bitcoin daemon (bitcoind)"
+echo "########### Adding Bitcoin software repository and installing Bitcoind"
 add-apt-repository -y ppa:bitcoin/bitcoin
 apt-get update -y
 apt-get install bitcoind -y
