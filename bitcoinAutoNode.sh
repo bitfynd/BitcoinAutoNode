@@ -7,12 +7,11 @@ currentSshPort=22
 newSshPort=44
 rpcport=8332
 btcport=8333
-email="admin@foo.com"
 
 echo "########### The server will reboot when the script is complete"
 
 echo "########### Adding firewall rules; changing default SSH port to: $newSshPort"
-sed -i 's/Port $currentSshPort/Port $newSshPort/g' /etc/ssh/sshd_config
+sed -i "s/Port $currentSshPort/Port $newSshPort/g" /etc/ssh/sshd_config
 service ssh restart
 ufw allow $newSshPort/tcp
 ufw allow $rpcport/tcp
@@ -33,30 +32,28 @@ apt-get update -y
 apt-get upgrade -y
 apt-get dist-upgrade -y
 apt-get autoremove -y
-apt-get install python-software-properties mailutils -y
+apt-get install python-software-properties -y
 
 echo "########### Adding Bitcoin software repository and installing Bitcoin daemon (bitcoind)"
 add-apt-repository -y ppa:bitcoin/bitcoin
 apt-get update -y
-mkdir ~/.bitcoin/
 apt-get install bitcoind -y
+mkdir ~/.bitcoin/
 
-config="~/.bitcoin/bitcoin.conf"
+config=".bitcoin/bitcoin.conf"
 echo "########### Creating config file ($config)"
+cd ~
 touch $config
 echo "# Server" > $config
 echo "testnet=0" >> $config
 echo "daemon=1" >> $config
 echo "connections=125" >> $config
-echo "port=$btcport"
+echo "port=$btcport" >> $config
 echo "paytxfee=0.0001" >> $config
 echo "gen=0" >> $config
 echo "4way=1" >> $config
 echo "#txindex=1" >> $config
 echo "#reindex=1" >> $config
-echo "alertnotify=echo %s | mail -s \"Bitcoin Daemon: Alert Notification\" $email" >> $config
-echo "blocknotify=echo %s | mail -s \"Bitcoin Daemon: Block Notification\" $email" >> $config
-echo "walletnotify=echo %s | mail -s \"Bitcoin Daemon: Wallet Notification\" $email" >> $config
 echo "# RPC" >> $config
 echo "server=1" >> $config
 randuser=`< /dev/urandom tr -dc A-Za-z0-9 | head -c30`
